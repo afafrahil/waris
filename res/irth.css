@@ -1,0 +1,102 @@
+input[type="checkbox"] {
+  margin-right: 0;
+  margin-left: 0;
+}
+input[type="button"] {
+  border-radius: 8px;
+}
+input:focus {
+	border-style: solid;
+}
+input:focus {
+	border-style: solid;
+}
+
+a {
+  text-decoration: none;
+}
+
+body {
+	background-color: AliceBlue;
+}
+body.popup {
+	background-color: #fffacd;
+}
+
+div.green {
+	background-image: url('igreen.jpg');
+}
+
+ul#menu li {
+	display:inline;
+}
+
+.verse {
+	font-family: "KFGQPC Uthman Taha Naskh", Amiri, "Traditional Arabic", Arial, sans-serif;
+	font-size: 20px;
+}
+.arabic {
+	font-family: Amiri, "Traditional Arabic", Arial, sans-serif;
+	font-size: 16px;
+}
+
+h1 h2 h3 {
+	font-size:10vw;
+}
+
+/* Responsive table */
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  margin-left:-5px;
+  margin-right:-5px;
+  width: 100%;
+}
+  
+.column1 {
+  float: left;
+  width: 30%;
+  padding: 1px;
+}
+
+.column2 {
+  float: left;
+  width: 32%;
+  padding: 1px;
+}
+
+.column3 {
+  float: left;
+  width: 38%;
+  padding: 1px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.column1 table, .column2 table, .column3 table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+}
+
+/*tr:nth-child(even) {
+  background-color: #f2f2f2;
+}*/
+
+/* Responsive layout - makes the columns stack on top of each other instead of next to each other on screens that are smaller than 1024 px */
+@media screen and (max-width: 1023px) {
+  .column1, .column2, .column3 {
+    width: 100%;
+}

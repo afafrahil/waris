@@ -1,0 +1,432 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0051)http://www.islamicsoftware.org/irth/v2/lang='id'/irth.html-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>IRTH</title>
+<meta http-equiv='cache-control' content='no-cache, no-store, must-revalidate'/>
+<meta http-equiv='expires' content='0'/>
+<meta http-equiv='pragma' content='no-cache'/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="keywords" content="Islamic software,freeware,Islamic inheritence,irth"/>
+<meta name="description" content="Calculate inheritance shares of eligible heirs according to Islamic law."/>
+<meta name="classification" content="Islamic software,freeware"/>
+<meta name="author" content="IslamicSoftware.org"/>
+<link rel="shortcut icon" href="../res/favicon.ico" type="image/x-icon"/>
+<link rel="stylesheet" href="../res/irth.css"/>
+<script type="text/javascript" src="../inc/env.js"></script>
+<script type="text/javascript" src="../inc/json2.js"></script>
+<script type="text/javascript" src="../inc/util.js"></script>
+<script type="text/javascript" src="../inc/rational.js"></script>
+<script type="text/javascript" src="texts.js"></script>
+<script type="text/javascript" src="../inc/lookup.js"></script>
+<script type="text/javascript" src="../inc/irth.js"></script>
+<script type="text/javascript" src="../inc/testirth.js"></script>
+<script type="text/javascript" src="../inc/irthui.js"></script>
+<style>
+.floatfix {
+	float: left;	/* default, may be reversed by correctFloat() */
+}
+.alignfix {
+	text-align: left;	/* default, may be reversed by correctFloat() */
+}
+</style>
+</head>
+<body onunload="closeResultsWindow();" onload="initPage();" lang='id' dir='ltr' >
+<noscript>
+<h1 align='center' style='text-align:center'>Halaman ini membutuhkan JavaScript 1.1</h1><p>Halaman ini membutuhkan browser yang mendukung JavaScript 1.1 atau lebih tinggi.</p><p>Browser Anda tidak mendukung JavaScript v1.1, atau JavaScript telah dinonaktifkan. Jika Anda ingin melihat halaman ini dengan benar, harap tingkatkan versi browser Anda atau aktifkan dukungan JavaScript.</p>
+</noscript>
+<script type="text/javascript"><!--
+	if (isIE) {
+		alert("Browser tidak kompatibel. Harap gunakan browser yang lebih modern, seperti Firefox");
+		location.href = "../inc/blank-IGNORE.html";
+	}
+//--></script>
+	<div class="green">
+	  <span title="Ditahbiskan oleh Tuhan. (Quran 4:11)"><img src="../res/fareedha_tr.png" alt="Ditahbiskan oleh Tuhan. (Quran 4:11)" id="FareedhaImage" style="float:right;"/></span>
+	  <span title="Pembagian yang ditentukan. (Quran 4:7) "><img src="../res/mafroodha_tr.png" alt="Pembagian yang ditentukan. (Quran 4:7) " id="NaseebanMafroodhanImage" style="float:left;"/></span>
+	  <h1 align="center" style="text-align:center;">
+		<a id="irth">IRTH</a>
+	  </h1>
+	  <h3 align="center" style="text-align:center;"> v2(Beta)</h3>
+	  <h2 align="center" style="text-align:center;">Warisan Islam</h2>
+	  
+	  <div align="center" style="text-align:center;">
+	  <select name="VersionsSelector" id="VersionsSelector" onchange="location.href=this.options[this.selectedIndex].value;" style="background-color:transparent;color:blue;font-weight:bold;">
+		<option value='./'>Klassik</option>
+		<option value='irthwiz.html'>langkah-langkah</option>
+		<option value='../../v1/'>Versi 1</option>
+	  </select>
+
+	  <select name="HelpSelector" id="HelpSelector" onchange="location.href=this.options[this.selectedIndex].value;" style="background-color:transparent;color:blue;font-weight:bold;">
+		<option value='irth.html'>Halaman</option>
+	    <option value='irthhelp.html'>Tolong</option>
+	    <option value='questions.html'>Pertanyaan</option>
+	    <option value='local.html'>Unduh</option>
+	    <option value='volunteer.html'>Ikut</option>
+	    <option value='http://www.islamicsoftware.org'>Rumah</option>
+	  </select>
+	
+	  <select name="TranslateSelector" id ="TranslateSelector" onchange="switchLanguage(this.options[this.selectedIndex].value);" style="background-color:transparent;color:blue;font-weight:bold;">;
+		<option value='en'>English</option>
+		<option value='ar'>عربي</option>
+		<option value='id'>Indonesia</option>
+		<option value='ur''>اردو</option>
+		<option value='ug''>ئۇيغۇر</option>
+		<option value='ps''>پښتو</option>
+		<option value='fa''>فارسی</option>
+		<option value='ku''>کوردی</option>
+		<option value='dv'' disabled>ދިވެހި</option>
+		<option value='af''>Afrikaans</option>
+		<option value='so''>Af-Soomaali</option>
+		<option value='az''>Azərbaycan</option>
+		<option value='bo''>босански</option>
+		<option value='de''>Deutsch</option>
+		<option value='es''>Español</option>
+		<option value='fr''>Français</option>
+		<option value='ha''>Hausa</option>
+		<option value='jv''>Jạwi</option>
+		<option value='kk''>Қазақ</option>
+		<option value='sw''>Kiswahili</option>
+		<option value='ms''>Melayu</option>
+		<option value='nl''>Nederlands</option>
+		<option value='pt''>Português</option>
+		<option value='sq''>Shqip</option>
+		<option value='tr''>Türk</option>
+		<option value='tk''>Türkmen</option>
+		<option value='ce''>Содержани</option>
+		<option value='cn''>中文</option>
+		<option value='ky''>Кыргызча</option>
+		<option value='ru''>Pусский</option>
+		<option value='tg''>тоҷикӣ</option>
+		<option value='uz''>ўзбекча</option>
+		<option value='bn''>বাংলা বর্ণমালা</option>
+		<option value='hi''>हिंदी</option>
+		<option value='ks''>कॉशुर</option>
+		<option value='th''>ภาษาไทย</option>
+		<option value='rh' disabled/>رُاَينڠَ</option>
+		<option value='am''>አማርኛ</option>
+		<option value='ot'>Bahasa Lain</option>
+	  </select>
+	  </div>
+	  <script type="text/javascript"><!--
+	  	if (isLocal===true) {
+			getElement("HelpSelector").options[3].disabled = true;	//Download
+			getElement("VersionsSelector").options[2].style.display = "none";	//v1
+			getElement("TranslateSelector").style.display = "none";
+		}
+	  //--></script>
+	</div>
+	 Terjemahan otomatis. Jika Anda dapat memperbaikinya, <a href='mailto:islamicsoftware.org@gmail.com?subject=A better translation'>beri tahu kami</a><br/> 
+	<!-------------------Irth Form----------------------------------------------------------------------->
+	<form id="IrthForm" action="#" style="width:100%;">
+		<div class="row">
+			<div class="column1 floatfix" style="float:left;">
+			<table id="Heirs1">
+			<tr>
+				<th width="18%" style="width:18%; text-align:left;" class="alignfix">Ahli waris</th>
+				<th width="5%" align="center" style="width:5%;text-align:center;">Jumlah</th>
+				<th width="10%" align="center" style="text-align:center;width:10%;">Bagikan</th>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Anak laki-laki</td>
+				<td align="center" style="text-align:center;"><input name="num1" id="num1" size="2" tabindex="1" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get1">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Anak perempuan</a></td>
+				<td align="center" style="text-align:center;"><input name="num2" id="num2" size="2" tabindex="2" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get2">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Ayah</a></td>
+				<td align="center" style="text-align:center;"><input name="num3" id="num3" type="checkbox" tabindex="3"/></td>
+				<td align="center" style="text-align:center;" id="get3">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Ibu</a></td>
+				<td align="center" style="text-align:center;"><input name="num4" type="checkbox" tabindex="4"/></td>
+				<td align="center" style="text-align:center;" id="get4">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Suami</td>
+				<td align="center" style="text-align:center;"><input name="num5" id="num5" type="checkbox" tabindex="5" onclick="if(this.checked==true)this.form.elements['num6'].checked=false;"/></td>
+				<td align="center" style="text-align:center;" id="get5">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Istri</td>
+				<td align="center" style="text-align:center;"><input name="num6" id="num6" type="checkbox" tabindex="6" onclick="if(this.checked==true)this.form.elements['num5'].checked=false;"/></td>
+				<td align="center" style="text-align:center;" id="get6">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Saudara kandung</td>
+				<td align="center" style="text-align:center;"><input name="num7" id="num7" size="2" tabindex="7" align="center" style="text-align:center;" /></td>
+				<td align="center" style="text-align:center;" id="get7">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Saudara perempuan penuh</td>
+				<td align="center" style="text-align:center;"><input name="num8" id="num8" size="2" tabindex="8" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get8">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Saudara tiri dari pihak ibu</td>
+				<td align="center" style="text-align:center;"><input name="num9" size="2" tabindex="9" id="num9" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get9">&nbsp;</td>
+			</tr>
+			</table>
+			</div>
+
+			<div class="column2 floatfix" style="float:left;">
+			<table id="Heirs2">
+			<tr>
+				<th width="20%" style="width:20%; text-align:left;" class="alignfix">Ahli waris</th>
+				<th width="5%" align="center" style="width:5%;text-align:center;">Jumlah</th>
+				<th width="10%" align="center" style="text-align:center;width:10%;">Bagikan</th>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Putra putra</td>
+				<td align="center" style="text-align:center;"><input name="num10" id="num10" size="2" tabindex="10" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get10">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Putri dari putra</a></td>
+				<td align="center" style="text-align:center;"><input name="num11" id="num11" size="2" tabindex="11" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get11">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Ayah^ dari Ayah</a></td>
+				<td align="center" style="text-align:center;"><input name="num12" id="num12" type="checkbox" tabindex="12"/></td>
+				<td align="center" style="text-align:center;" id="get12">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Ibu^ dari Ayah&nbsp; 
+					<span>
+					<input name="gmfy" id="gmfy" type="checkbox" value="1" onclick="this.form.elements['gmmy'].checked=false;return true;"/><a href="javascript:showGmGen()">Muda</a>
+					</span>
+				</td>
+				<td align="center" style="text-align:center;">
+					<input name="num13" tabindex="13" type="checkbox" id="num13" tabindex="13" type="checkbox"/>
+				</td>
+				<td align="center" style="text-align:center;" id="get13">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Saudara kandung ayah</td>
+				<td align="center" style="text-align:center;"><input name="num14" size="2" tabindex="14" id="num14" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get14">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Ayah tiri dari pihak ayah</td>
+				<td align="center" style="text-align:center;"><input name="num15" size="2" tabindex="15" id="num15" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get15">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Saudara tiri dari pihak ayah</td>
+				<td align="center" style="text-align:center"><input name="num16" size="2" tabindex="16" id="num16" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center" id="get16">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Saudara tiri dari pihak ayah</td>
+				<td align="center" style="text-align:center;"><input name="num17" size="2" tabindex="17" id="num17" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get17">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix"><a href="relativesm.html">Kerabat lainnya</a></td>
+				<td align="center" style="text-align:center;"><input name="num18" size="2" tabindex="18" id="num18" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get18">&nbsp;</td>
+			</tr>
+			</table>
+			</div>
+			
+			<div class="column3 floatfix" style="float:left;">
+			<table id="Heirs3">
+			<tr>
+				<th width="25%" style="width:25%; text-align:left;" class="alignfix">Ahli waris</th>
+				<th width="5%" align="center" style="width:5%;text-align:center;">Jumlah</th>
+				<th width="10%" align="center" style="text-align:center;width:10%;">Bagikan</th>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Putra dari saudara kandung</td>
+				<td align="center" style="text-align:center"><input name="num19" id="num19" size="2" tabindex="19" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get19">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Putra dari saudara tiri dari pihak ayah</td>
+				<td align="center" style="text-align:center;"><input name="num20" size="2" tabindex="20" id="num20" size="2" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get20">&nbsp;</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Ibu^ dari Ibu&nbsp; 
+					<span>
+					<input name="gmmy" id="gmmy" type="checkbox" value="2" onclick="this.form.elements['gmfy'].checked=false;return true;"/><a href="javascript:showGmGen()">Muda</a>
+					</span>
+				</td>
+				<td align="center" style="text-align:center;">
+					<input name="num21" tabindex="21" type="checkbox" id="num21" tabindex="21" type="checkbox"/>
+				</td>
+				<td align="center" style="text-align:center;" id="get21">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Putra dari saudara kandung ayah</td>
+				<td align="center" style="text-align:center;"><input name="num22" size="2" tabindex="22" id="num22" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get22">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Anak dari saudara tiri ayah dari ayah</td>
+				<td align="center" style="text-align:center;"><input name="num23" size="2" tabindex="23" id="num23" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get23">&nbsp;</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Pelayan</td>
+				<td align="center" style="text-align:center;"><input name="num24" size="2" tabindex="24" id="num24" align="center" style="text-align:center;"/></td>
+				<td align="center" style="text-align:center;" id="get24">&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="2" style="text-align:left;" class="alignfix">Wasiat (pecahan rasional <= 1/3)</td>
+				<td tabindex="25" align="center" style="text-align:center;"><input type="text" name="bequestField" id="bequestField" size="2" minlength="3" pattern="/\d+\/[2-9]\d*/" align="center" style="text-align:center;" onblur="if(isGt(toRational(this.value),third))this.value='1/3'"/></td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" class="alignfix">Perbendaharaan Islam</td>
+				<td>&nbsp;</td>
+				<td align="center" style="text-align:center;" id="get25">&nbsp;</td>
+			</tr>
+			</table>
+			</div>
+		</div>
+
+		<div align="center" style="text-align:center;">
+			<input type="button" value="Hitung" name="CalculateButton" id="CalculateButton" onclick="calculate();return true;"/>
+			<input type="button" value="Rinciannya" name="DetailsButton" id="DetailsButton" disabled="disabled" onclick="if(resultsWindow)resultsWindow.focus();else displaySharesNS();return true;"/>
+			<input type="button" value="Mulai Lagi" onclick="location.reload();"/>
+		</div>
+		<div align="center" style="text-align:center;">
+			<input type="button" name="PreviousTestButton" id="PreviousTestButton" value="<<" onclick="previousTest();return true;"/>
+			<!-------------------Test Cases----------------------------------------------------------------->
+			<select name="TestCaseSelector" onchange="showTestCase(this.options[this.selectedIndex].value);return true;">
+				<option value="-1" selected="selected">Kasus Uji</option>
+				<option value="-2">Abu-Bakr</option>
+				<option value="-3">Gharraia (Omar)</option>
+				<option value="-4">Minbaria (Ali)</option>
+				<option value="-5">Hakim Syuraih</option>
+				<option value="-6">Syafiia</option>
+				<option value="-7">Kharqaa</option>
+				<option value="-8">Malikia</option>
+				<option value="-9">Pseudo-Malikia</option>
+				<option value="-10">Akdaria</option>
+				<option value="-11">Musytarika</option>
+				<option value="-30">Putra dan putri </option>
+				<option value="-31">Putri dan tidak ada putri</option>
+				<option value="-32">Putri dan saudara kandung</option>
+				<option value="-33">Orangtua</option>
+				<option value="-34">Kakek dan saudara kandung</option>
+				<option value="-35">Pasangan</option>
+				<option value="-101">Hanya ahli waris</option>
+				<option value="-100">Tidak ada ahli waris</option>
+				<option value="-98">kasus acak</option>
+				<option value="-99">ahli waris acak</option>
+				<option value="-1000">semua kasus</option>
+			</select>
+			<input type="button" name="NextTestButton" id="NextTestButton" value=">>" onclick="nextTest();return true;"/>&nbsp;
+			<span id="caseNum">&nbsp;</span>
+		</div>
+	</form>
+	<!-------------Preferences Form----------------->
+	<form id="PreferencesForm" action="#" style="width:100%;">
+		<a id="preferences"><b><h2>Preferensi:</h2></b></a>
+		<div class="row">
+			<div class="column1 floatfix" style="float:left;">
+			<table id="Prefs1">
+			<tr>
+				<td style="text-align:left;" class="alignfix">
+				<b title="Mazhab">Sekolah hukum :</b>
+				<select name="SchoolSelector" onchange="school=this.options[this.selectedIndex].value;" style="background-color:transparent;color:blue;font-weight:bold;">
+					<option value="1" selected>Hanafi</option>
+					<option value="2">Maliki</option>
+					<option value="3">Syafii</option>
+					<option value="4">Hanbali</option>
+					<option value="6">Zahiri</option>
+					<option value="5">Hukum Mesir</option>
+					<option value="7">Jaafari</option>
+					<option value="8">Ibadhi</option>
+					<option value="9" disabled>Zaidi</option>
+					<option value="0">Tidak ada preferensi</option>
+				</select>
+				<p>
+				Sekolah yuristik mungkin memiliki pendapat berbeda tentang cara membagi perkebunan. Pilih sekolah hukum yang Anda ikuti atau lebih suka untuk diikuti. Jika Anda tidak mengikuti sekolah hukum tertentu, Anda dapat memilih 'Tidak ada preferensi'. Defaultnya adalah sekolah hukum Abu-Haneefa.
+				</p>
+				</td>
+			</tr>
+			</table>
+			</div>
+			<div class="column2 floatfix" style="float:left;">
+			<table id="Prefs2">
+			<tr>
+				<td style="text-align:left;" class="alignfix">
+				<b>Preferensi membatalkan langganan:</b>
+				<p>
+				Jika jumlah saham yang dibagikan <em>kurang</em> dari warisan, bagaimana Anda memilih untuk membagikan sisanya?
+				</p>
+				</td>
+			</tr>
+			<tr>
+			<td valign="top" style="text-align:left;" class="alignfix">
+				<input type="radio" name="Undersub" value="1" checked="checked"/>
+				Bagilah di antara ahli waris yang disebutkan dengan rasio satu sama lain dari bagian yang mereka sebutkan (Konsensus)
+			</td>
+			</tr>
+			<tr>
+			<td valign="top" style="text-align:left;" class="alignfix">
+				<input type="radio" name="Undersub" value="2"/>
+				Sertakan pasangan dalam pemisah (Utsman)
+			</td>
+			</tr>
+			<tr>
+			<td valign="top" style="text-align:left;" class="alignfix">
+				<input type="radio" name="Undersub" value="0"/>
+				Berikan ke perbendaharaan Islam (Maliki)
+			</td>
+			</tr>
+			</table>
+			</div>
+			<div class="column3 floatfix" style="float:left;">
+			<table id="Prefs3">
+			<tr>
+				<td style="text-align:left;" class="alignfix">
+				<b>Preferensi langganan berlebih:</b>
+				<p>
+				Jika jumlah saham yang dibagikan <em>lebih</em> dari harta warisan, apa yang Anda pilih untuk mereset saham tersebut?
+				</p>
+				</td>
+			</tr>
+			<tr>
+			<td valign="top" style="text-align:left;" class="alignfix">
+				<input type="radio" name="Oversub" value="1" checked="checked"/>
+				Membagi kembali semua saham dengan rasionya satu sama lain (Konsensus)
+			</td>
+			</tr>
+			<tr>
+			<td valign="top" style="text-align:left;" class="alignfix">
+				<input type="radio" name="Oversub" value="0"/>
+				Mengurangi bagian ahli waris wanita terjauh (Zahiri/Jaafari) 
+			</td>
+			</tr>
+			<tr><td>&nbsp;</td></tr>
+			</table>
+			</div>
+		</div>
+		<!--Determining allowRudd and allowRuddToSpouses is done in initialize()-->
+		
+		<div align="center">
+			<input type="button" value="Kembali keHalaman Entri" onclick="location.href='#irth'"/>&nbsp;&nbsp;
+			<input type="button" value="Preferensi Pengaturan Ulang" onclick="clearPreferences()"/>
+		</div>
+	</form>
+	Semoga Tuhan menerima pekerjaan ini dan mengubahnya menjadi 'ilmu yang bermanfaat.'
+	<hr/>
+	<img src="../res/132px-Cc-by-nc-nd_icon.svg.png" alt="Lisensi Creative Commons CC-BY-NC-ND" height="35" width="132" id="CopyrightLogo" style="float:right;" title="Lisensi Creative Commons CC-BY-NC-ND"/>
+	<span id="Copyright" style="float:left;text-align:left;" class="floatfix alignfix"><tt>23 Juni 2021-13 Zul Qi'dah 1442. </tt>&copy;&nbsp;1989+&nbsp;<a href='mailto:IslamicSoftware.org@gmail.com?subject=About your IRTH program'>IslamicSoftware.org</a>&nbsp;Lisensi CC-BY-NC-ND.<br/>Desain logo oleh Shaddim; simbol lisensi CC asli oleh Creative Commons [<a href='https://creativecommons.org/licenses/by/4.0'>CC BY 4.0</a>], <a href='https://commons.wikimedia.org/wiki/File:Creative_commons_license_spectrum.svg'>melalui Wikimedia Commons</a></span>
+</body>
+</html>

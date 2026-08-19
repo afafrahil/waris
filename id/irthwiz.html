@@ -1,0 +1,844 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0054)http://www.islamicsoftware.org/irth/v2/lang='id'/irthwiz.html-->
+<html>
+<head>
+  <title>Antarmuka langkah-langkah ke program IRTH.</title>
+  <meta http-equiv='cache-control' content='no-cache, no-store, must-revalidate'/>
+  <meta http-equiv='expires' content='0'/>
+  <meta http-equiv='pragma' content='no-cache'/>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="keywords" content="Islamic software,freeware,Islamic inheritence,irth"/>
+  <meta name="description" content="Calculate inheritance shares of eligible heirs according to Islamic law."/>
+  <meta name="classification" content="Islamic software,freeware,CC-BY-NC-ND"/>
+  <meta name="author" content="IslamicSoftware.org"/>
+  <link rel="shortcut icon" href="../res/favicon.ico" type="image/x-icon"/>
+  <link rel="stylesheet" href="../res/irth.css"/>
+  <script type="text/javascript" src="../inc/env.js"></script>
+  <script type="text/javascript" src="../inc/json2.js"></script>
+  <script type="text/javascript" src="../inc/util.js"></script>
+  <script type="text/javascript" src="../inc/rational.js"></script>
+  <script type="text/javascript" src="texts.js"></script>
+  <script type="text/javascript" src="../inc/lookup.js"/></script>
+  <script type="text/javascript" src="../inc/irth.js"></script>
+  <script type="text/javascript">
+	RELATION = ["Wasiat","Putra","Putri","Ayah","Ibu","Suami","Istri","Kakak laki-laki","Kakak perempuan penuh","Saudara tiri dari pihak ibu","Putra dari putra","Putri dari putra","Ayah^ dari Ayah","Ibu^ dari Ayah","Saudara kandung dari ayah","Saudara tiri dari pihak ayah dari ayah","Saudara tiri dari pihak ayah","Kakak tiri dari pihak ayah","Kerabat lainnya","Putra dari saudara laki-laki penuh","Anak dari saudara tiri dari pihak ayah","Ibu^ dari Ibu","Putra dari saudara kandung ayah","Anak dari saudara tiri ayah dari ayah","Pelayan","Perbendaharaan Islam"];
+	RELATIONS = ["Wasiat","Anak laki-laki","Anak perempuan","Ayah","Ibu","Suami","istri","Saudara kandung","Saudara perempuan penuh","Saudara tiri dari pihak ibu","Putra putra","Putri dari putra","Ayah^ dari Ayah","_Gmother_","Saudara kandung ayah","Ayah tiri dari pihak ayah","Saudara tiri dari pihak ayah","-SistersF_","Kerabat lainnya","Putra dari saudara kandung","Putra dari saudara tiri dari pihak ayah","_Gmother_","Putra dari saudara kandung ayah","Anak dari saudara tiri ayah dari ayah","Pelayan","Perbendaharaan Islam"];
+
+	/**
+	 *	Initialize the HeirsInfo array. 
+	 *	Element 0 is for bequest, element 25 is for treasury
+	 *	Both are treated differently from heirs, so their count is always 0
+	 */
+	function initializeHeirsInfo() {
+		var hi = [];
+		var he = {"relation":RELATIONS[0], "count":0};
+		hi.push(he);
+		for (var i=son; i<treasury; i++) {
+			he = {"relation":RELATIONS[i], "count":0};
+			hi.push(he);
+		}
+		he = {"relation":RELATIONS[treasury], "count":0};
+		hi.push(he);
+		return hi;
+	}
+
+	initializeHeirsInfo();
+
+	/**
+	 *	Write out a debugging statement
+	 *	This overrides the one in irth.js in order to write debugging statements to the console only
+	 *	@param	msg: string, the statement
+	 */
+	function debug(msg) {
+		console.log("[debug] " + msg + "\n");
+	}
+
+	/**
+	 *	Write out a detail statement
+	 *	This overrides the one in irth.js in order to write detail statements to the console only
+	 *	@param	msg: string, the statement
+	 */
+	function detail(msg) {
+		debugText += msg + "<br" + "/>";
+		console.log(msg + "\n");
+	}
+
+	/**
+	 *	Corrects the float according to writing direction
+	 *	@param	rtl: string, "rtl" for right-to-left, or "ltr" for left-to-right (default)
+	 */
+	function correctFloat(rtl) {
+		//Correct left
+		document.body.dir = (rtl? 'rtl' : 'ltr');
+		var floatfix = document.getElementsByClassName('floatfix');
+		var alignfix = document.getElementsByClassName('alignfix');
+		var copyrightlogofix = document.getElementById('CopyrightLogo');
+		if (floatfix && floatfix.length>0) 
+			for (var i=0; i<floatfix.length; i++)
+				floatfix[i].style['float'] = (rtl? 'right' : 'left');
+		if (alignfix && alignfix.length>0) 
+			for (var i=0; i<alignfix.length; i++)
+				alignfix[i].style['text-align'] = (rtl? 'right' : 'left');
+		if (copyrightlogofix) copyrightlogofix.style['float'] = (rtl? 'left' : 'right');
+	}
+	/**
+	 *	Switch to a supported language
+	 *	@param	languageCode: string, target language code, e.g., "fa" for Farsi
+	 */
+	function switchLanguage(languageCode) {
+		setTranslationCookie("");
+		if ("en"==languageCode || "ar"==languageCode || "id"==languageCode) {
+			location.href = "../" + languageCode + "/irthwiz.html";
+		}
+		else {
+			setTranslationCookie(languageCode);
+			var dir = ("fa"==languageCode || "ur"==languageCode || "di"==languageCode || "ug"==languageCode || "ps"==languageCode || "rh"==languageCode || "he"==languageCode);
+			location.href = "../ot/irthwiz.html?lang=" + languageCode + (dir? "&dir=rtl" : "");
+		}
+	}
+	/**
+	 *	Sets direction of text writing and element positioning to "rtl" if so passed in the query string
+	 */
+	function setPageDirection() {
+		var lang = getPageLanguage();
+		if ("en"==lang || "ar"==lang || "id"==lang) return;		//already taken care of
+		else correctFloat(isPageLanguageDirectionRTL());
+	}
+	/**
+	 *	Called after the page is loaded to set its language and writing direction
+	 *	which are passed to the translation cookie and automatically translated pages
+	 */
+	function initPage() {
+		var lang = getPageLanguage();
+		if (!lang || ""==lang || "en"==lang || "ar"==lang || "id"==lang) 
+			setTranslationCookie("");
+		else {
+			setPageLanguage();
+			setPageDirection();
+			setTranslationCookie(getPageLanguage());
+			getElement("HelpSelector").options[3].disabled = true;	//Downlaod
+		}
+		setSelectedLanguage(lang? lang : "en");
+		var classic = getElement("VersionsSelector").options[0];
+		var wizard = getElement("VersionsSelector").options[1];
+		classic.value += lang? "?lang="+lang : "";
+		wizard.value += lang? "?lang="+lang : "";
+		if (isPageLanguageDirectionRTL()) {
+			classic.value += "&dir=rtl";
+			wizard.value += "&dir=rtl";
+		}
+	}
+
+	initialize();
+
+	resultsWindow = null;
+  </script>
+</head>
+
+<body onunload="closeResultsWindow()" lang='id' dir='ltr'  onload="initPage();">
+<noscript>
+<h1 align='center' style='text-align:center'>Halaman ini membutuhkan JavaScript 1.1</h1><p>Halaman ini membutuhkan browser yang mendukung JavaScript 1.1 atau lebih tinggi.</p><p>Browser Anda tidak mendukung JavaScript v1.1, atau JavaScript telah dinonaktifkan. Jika Anda ingin melihat halaman ini dengan benar, harap tingkatkan versi browser Anda atau aktifkan dukungan JavaScript.</p>
+</noscript>
+<script type="text/javascript"><!--
+	if (isIE) {
+		alert("Browser tidak kompatibel. Harap gunakan browser yang lebih modern, seperti Firefox");
+		location.href = "../inc/blank-IGNORE.html";
+	}
+//--></script>
+	<div class="green">
+	  <span title="Pembagian yang ditentukan. (Quran 4:7) "><img src="../res/mafroodha_tr.png" alt="Pembagian yang ditentukan. (Quran 4:7) " id="NaseebanMafroodhanImage" style="float:left;"/></span>
+	  <span title="Ditahbiskan oleh Tuhan. (Quran 4:11)"><img src="../res/fareedha_tr.png" alt="Ditahbiskan oleh Tuhan. (Quran 4:11)" id="FareedhaImage" style="float:right;"/></span>
+	  <h1 align="center" style="text-align:center;">
+		<a id="irth">IRTH</a>
+	  </h1>
+	  <h3 align="center" style="text-align:center;">v2(Beta)</h3>
+	  <h2 align="center" style="text-align:center;">Warisan Islam</h2>
+
+	  <div align="center" style="text-align:center;">
+	  <select name="VersionsSelector" id="VersionsSelector" onchange="location.href=this.options[this.selectedIndex].value;" style="background-color:transparent;color:blue;font-weight:bold;">
+		<option value='irthwiz.html'>langkah-langkah</option>
+		<option value='./'>Klassik</option>
+		<option value='../../v1/'>Versi 1</option>
+	  </select>
+
+	  <select name="HelpSelector" id="HelpSelector" onchange="location.href=this.options[this.selectedIndex].value;" style="background-color:transparent;color:blue;font-weight:bold;">
+		<option value='irth.html'>Halaman</option>
+	    <option value='irthhelp.html'>Tolong</option>
+	    <option value='questions.html'>Pertanyaan</option>
+	    <option value='local.html'>Unduh</option>
+	    <option value='volunteer.html'>Ikut</option>
+	    <option value='http://www.islamicsoftware.org'>Rumah</option>
+	  </select>
+
+	  <select name="TranslateSelector" id ="TranslateSelector" onchange="switchLanguage(this.options[this.selectedIndex].value);" style="background-color:transparent;color:blue;font-weight:bold;">;
+		<option value='en'>English</option>
+		<option value='ar'>عربي</option>
+		<option value='id'>Indonesia</option>
+		<option value='ur''>اردو</option>
+		<option value='ug''>ئۇيغۇر</option>
+		<option value='ps''>پښتو</option>
+		<option value='fa''>فارسی</option>
+		<option value='ku''>کوردی</option>
+		<option value='dv'' disabled>ދިވެހި</option>
+		<option value='af''>Afrikaans</option>
+		<option value='so''>Af-Soomaali</option>
+		<option value='az''>Azərbaycan</option>
+		<option value='bo''>босански</option>
+		<option value='de''>Deutsch</option>
+		<option value='es''>Español</option>
+		<option value='fr''>Français</option>
+		<option value='ha''>Hausa</option>
+		<option value='jv''>Jạwi</option>
+		<option value='kk''>Қазақ</option>
+		<option value='sw''>Kiswahili</option>
+		<option value='ms''>Melayu</option>
+		<option value='nl''>Nederlands</option>
+		<option value='pt''>Português</option>
+		<option value='sq''>Shqip</option>
+		<option value='tr''>Türk</option>
+		<option value='tk''>Türkmen</option>
+		<option value='ce''>Содержани</option>
+		<option value='cn''>中文</option>
+		<option value='ky''>Кыргызча</option>
+		<option value='ru''>Pусский</option>
+		<option value='tg''>тоҷикӣ</option>
+		<option value='uz''>ўзбекча</option>
+		<option value='bn''>বাংলা বর্ণমালা</option>
+		<option value='hi''>हिंदी</option>
+		<option value='ks''>कॉशुर</option>
+		<option value='th''>ภาษาไทย</option>
+		<option value='rh' disabled/>رُاَينڠَ</option>
+		<option value='am''>አማርኛ</option>
+		<option value='ot'>Bahasa Lain</option>
+	  </select>
+	  </div>
+	  <script type="text/javascript"><!--
+	  	if (isLocal===true) {
+			getElement("HelpSelector").options[3].disabled = true;	//Download
+			getElement("VersionsSelector").options[2].style.display = "none";	//v1
+			getElement("TranslateSelector").style.display = "none";
+		}
+		/**
+		 *	Sets the selected language in language drop-down menu
+		 *	@param	languageCode: string, language code, e.g., "es"
+		 */
+		function setSelectedLanguage(languageCode) {
+			var sel = getElement("TranslateSelector");
+			for (var i=0; i<sel.options.length; i++) {
+				if (sel.options[i].value == languageCode) {
+					sel.options[i].selected = true;
+					break;
+				}
+			}
+		}
+	  //--></script>
+	</div>
+	 Terjemahan otomatis. Jika Anda dapat memperbaikinya, <a href='mailto:islamicsoftware.org@gmail.com?subject=A better translation'>beri tahu kami</a><br/> 
+  <h3>1. Tentukan ahli waris:&nbsp;<a href="javascript:showHelp('hlpheirs.html',300,300);"><img src="../res/qmark.gif"></a></h3>
+	Kekerabatan:&nbsp;<select name="Relation" id="Relation">
+		<option value="1">Putra</option>
+		<option value="2">Putri</option>
+		<option value="3">Ayah</option>
+		<option value="4">Ibu</option>
+		<option value="5">Suami</option>
+		<option value="6">Istri</option>
+		<option value="7">Kakak laki-laki</option>
+		<option value="8">Kakak perempuan penuh</option>
+		<option value="16">Saudara tiri dari pihak ayah</option>
+		<option value="17">Kakak tiri dari pihak ayah</option>
+		<option value="9">Saudara tiri dari pihak ibu</option>
+		<option value="10">Putra dari putra</option>
+		<option value="11">Putri dari putra</option>
+		<option value="12">Ayah^ dari Ayah</option>
+		<option value="13">Ibu^ dari Ayah</option>
+		<option value="21">Ibu^ dari Ibu</option>
+		<option value="19">Putra dari saudara laki-laki penuh</option>
+		<option value="20">Anak dari saudara tiri dari pihak ayah</option>
+		<option value="14">Saudara kandung dari ayah</option>
+		<option value="15">Saudara tiri dari pihak ayah dari ayah</option>
+		<option value="22">Putra dari saudara kandung ayah</option>
+		<option value="23">Anak dari saudara tiri ayah dari ayah</option>
+		<option value="18">Kerabat lainnya</option>
+		<option value="24">Pelayan</option>
+	</select>
+	<input type="button" name="add" id="add" value="Menambahkan" onclick="addHeir();"/>
+	<input type="button" name="remove" id="remove" value="Menghapus" onclick="removeHeir();"/>
+	<br/>
+	<span id="hl"></span>
+	<h3>2. Setel preferensi:&nbsp;<a href="javascript:showHelp('helppref.html',300,330);"><img src="../res/qmark.gif"></a></h3>
+  
+	<table border="0" width="40%" style="border:0;width:40%;">
+	<tr>
+	<td style="float:left;text-align:left;" class="floatfix alignfix">
+		<label for="sc" title="Mazhab">Sekolah hukum</label>
+	</td>
+	<td style="float:left;text-align:left;" class="floatfix alignfix">
+	<select name="sc" id="sc" onChange="setRudd();setAwl();">
+		<option value="1">Hanafi</option>
+		<option value="2">Maliki</option>
+		<option value="3">Syafii</option>
+		<option value="4">Hanbali</option>
+		<option value="6">Zahiri</option>
+		<option value="5">Hukum Mesir</option>
+		<option value="7">Jaafari</option>
+		<option value="8">Ibadhi</option>
+		<option value="9" disabled>Zaidi</option>
+		<option value="0">Tidak ada preferensi</option>
+	</select>
+	</td>
+	</tr>
+	<tr>
+	<td style="float:left;text-align:left;" class="floatfix alignfix">
+		<label for="rv" title="Apakah akan mengizinkan pembagian sisa harta warisan yang belum berlangganan kepada ahli waris yang disebutkan. Jika tidak diizinkan, sisanya masuk ke kas Islam">Aturan Pembalikan</label>
+	</td>
+	<td style="float:left;text-align:left;" class="floatfix alignfix">
+	<select name="rv" id="rv">
+		<option value="1">Diizinkan</option>
+		<option value="2">Diperluas ke Pasangan</option>
+		<option value="0">Tidak diperbolehkan </option>
+	</select>
+	</td>
+	</tr>
+	<tr>
+	<td style="float:left;text-align:left;" class="floatfix alignfix">
+		<label for="aw" title="Apakah akan mengizinkan pembagian kembali perkebunan yang kelebihan permintaan berdasarkan rasio proporsinya satu sama lain. Jika tidak diperbolehkan, kelebihannya dikurangkan dari bagian ahli waris perempuan terjauh">Aturan Pembagian Ulang</label>
+	</td>
+	<td style="float:left;text-align:left;" class="floatfix alignfix">
+	<select name="aw" id="aw">
+		<option value="1">Diizinkan</option>
+		<option value="0">Tidak diperbolehkan </option>
+	</select>
+	</td>
+	</tr>
+	<tr>
+	<td style="float:left;text-align:left;" class="floatfix alignfix">
+		<label for="bq" title="Wasiat, yang dinyatakan sebagai bagian rasional dari harta warisan, tidak melebihi 1/3">Wasiat (pecahan rasional <= 1/3)</label>
+	</td>
+	<td style="float:left;text-align:left;" class="floatfix alignfix"><input type=Text" width="2" minlength="3" name="bq" id="bq" pattern="/\d+\/[2-9]\d*/" onblur="if(isGt(toRational(this.value),third))this.value='1/3'"/>
+	</td>
+	</tr>
+	<tr>
+	<td colspan="2" align="right" style="float:right">
+	<input type="button" name="go" id="go" value="Hitung" onclick="calculate();window.scrollBy(0,360);" style="border-radius:8px;"/>&nbsp;
+	<input type="button" name="dt" id="dt" value="Rinciannya" onclick="calculate(1);"/>&nbsp;
+	<input type="button" name="reset" id="reset" value="Mulai Lagi" onclick="clearFields();"/>
+	</td>
+	</tr>
+	</table>
+	
+	<h3>3. Distribusi harta warisan:</h3>
+	<span id="ed" style="text-align:left;" class="alignfix">&nbsp;</span>
+	<div>
+	<hr/>
+	<img src="../res/132px-Cc-by-nc-nd_icon.svg.png" alt="Lisensi Creative Commons CC-BY-NC-ND" height="35" width="132" id="CopyrightLogo" style="float:right;" title="Lisensi Creative Commons CC-BY-NC-ND"/>
+	<span id="Copyright" style="float:left;text-align:left;" class="floatfix alignfix"><tt>23 Juni 2021-13 Zul Qi'dah 1442. </tt>&copy;&nbsp;1989+&nbsp;<a href='mailto:IslamicSoftware.org@gmail.com?subject=About your IRTH program'>IslamicSoftware.org</a>&nbsp;Lisensi CC-BY-NC-ND.<br/>Desain logo oleh Shaddim; simbol lisensi CC asli oleh Creative Commons [<a href='https://creativecommons.org/licenses/by/4.0'>CC BY 4.0</a>], <a href='https://commons.wikimedia.org/wiki/File:Creative_commons_license_spectrum.svg'>melalui Wikimedia Commons</a></span>
+	</div>
+	<div>
+	<input type="text" name="hc" id="hc" size="54" readonly="readonly" disabled="disabled" style="background-color:Silver;display:none;"></input>
+	<br/>
+	<span id="hn" wrap="soft" disabled="disabled" style="background-color:Silver;display:none;"></span>
+	</div>
+	<script type="text/javascript">
+	elements = {"rl":getElement("Relation"),
+				"hl":getElement("hl"),
+				"sc":getElement("sc"),
+				"rv":getElement("rv"),
+				"aw":getElement("aw"),
+				"bq":getElement("bq"),
+				"ed":getElement("ed"),
+				"hc":getElement("hc"),
+				"hn":getElement("hn"),
+				"add":getElement("add"),
+				"remove":getElement("remove"),
+				"go":getElement("go"),
+				"dt":getElement("dt"),
+				"reset":getElement("reset")
+	};
+
+	/**
+	 **	Pop a help window
+	 **	@param	doc: string. URL of the help document
+	**/
+	function showHelp(doc, width, height)
+	{
+		var win = window.open(
+			doc, 
+			"HelpWindow", 
+			"directories=0,status=0,toolbar=0,location=0,resizable=0,width="+width+",height="+height+",left=60,screenX=60,top=50,screenY=50"
+		);
+		if (!win.opener) win.opener = self;
+		//win.document.close();
+		win.focus();
+	}
+
+	/**
+	 *	Get the HeirsInfo field value
+	 *	@return	array of heirs info objects, each has the properties "relation", "names" and "share"
+	 */
+	function getHeirsInfo() {
+		var histr = elements["hn"].innerText;
+		var hi = histr? JSON.parse(histr) : initializeHeirsInfo();
+		//console.log("hn=" + JSON.stringify(hi) + "\n");
+		return hi;
+	}
+
+	/**
+	 *	Determine whether updating the HeirsInfo array when a name is added by addHeir() is valid
+	 *	@param	index: index into HeirsInfo array
+	 *	@return	false if index is out of the range 0..25, or heir count already set to its max.
+	 */
+	function isUpdateHeirsInfo(index) {
+		var hi = getHeirsInfo();
+		var countMax = {"husband":1,"wives":4,"father":1,"mother":1,"grandfather":1,"grandmother":1};
+		//console.log("Max counts:\n" + JSON.stringify(countMax) + "\n");
+		console.log(hi[index].relation + " count = " + hi[index].count + "\n");
+		console.log(hi[index].relation + " max count = " + countMax[hi[index].relation] + "\n");
+		if (index<0 || index >= hi.length) {
+			console.warn(index + " is outside the HeirsInfo array bounds. Add ignored.\n");
+			return false;
+		}
+		else if (hi[index].count >= countMax[hi[index].relation]) {
+			console.warn(hi[index].relation + " count is at max. Add ignored.\n");
+			return false;
+		}
+		else if (index==wife && hi[husband].count>0) {
+			console.warn("Husband been set. Cannot also add wife. Add ignored.\n");
+			return false;
+		}
+		else if (index==husband && hi[wife].count>0) {
+			console.warn("Wife been set. Cannot also add husband. Add ignored.\n");
+			return false;
+		}
+		else return true;
+	}
+
+	/**
+	 *	Set the HeirsInfo field value
+	 *	@param	hi, array of heirs info objects, each has the properties "relation", "names" and "share"
+	 *			Default is current value of the HeirsInfo array, stringified
+	 */
+	function setHeirsInfo(hi) {
+		if (hi) elements["hn"].innerText = JSON.stringify(hi);
+		else elements["hn"].innerText = JSON.stringify(getHeirsInfo());
+		console.log("HeirsInfoField now: " + elements["hn"].innerText + "\n");
+	}
+
+	/**
+	 *	Update the HeirsInfo array when a name is added by addHeir()
+	 *	@param	index: index into HeirsInfo array. Ignored if it's out of the range 0..25
+	 */
+	function updateHeirsInfo(index, remove) {
+		var hi = getHeirsInfo();
+		if (isUpdateHeirsInfo(index)) {
+			if (remove && hi[index].count>=1) 
+				hi[index].count -= 1;
+			else hi[index].count += 1;
+			if (hi[index].count==1)
+				hi[index].relation = RELATION[index];
+			else hi[index].relation = RELATIONS[index];
+		}
+		setHeirsInfo(hi);
+	}
+
+	/**
+	 *	List the heirs
+	 *	@return	heir list by relation and count
+	 */
+	function listHeirs() {
+		var hi = getHeirsInfo();
+		var str = "[";
+		for (var i=son; i<treasury; i++) {	//loop over relations
+			var count = hi[i].count;
+			if (count == 0) continue;
+			else if (count == 1)
+				str += RELATION[i];
+			else str += count + " " + RELATIONS[i];
+			str += "; ";
+		}
+		return str.replace(/;\s$/, '') + ']';
+	 }
+
+	/**
+	 *	Generate an heirs count array
+	 *	@return	a comma-separated string of integers
+	 */
+	function getHeirsCount() {
+		var hc = [];
+		var hi = getHeirsInfo();
+		hc.push(0);		//Bequest and treasury counts are always 0
+		for (var i=son; i<treasury; i++) {
+			hc.push(hi[i].count);
+		}
+		hc.push(0);	//Bequest and treasury counts are always 0
+		var hcstr = hc.toString();
+		return hcstr;
+	}
+
+	/**
+	 *	Get the HeirsCount field value
+	 *	@return	string content of the field, 26 comma-sparated integers representing 
+	 *			heir count in each category
+	 */
+	function getHeirsCountField() {
+		return elements["hc"].value;
+	}
+
+	/**
+	 *	Set the HeirsCount field value
+	 *	@param	hc, string of 26 comma-sparated integers representing heir count in each category
+	 *			Default is computed from current value of HeirsInfo array
+	 */
+	function setHeirsCountField(hc) {
+		if (hc) elements["hc"].value = hc;
+		else elements["hc"].value = getHeirsCount();
+	}
+
+	/**
+	 *	Get the bequest input
+	 *	@return	string, expressed as a rational fraction
+	 */
+	function getBequest() {
+		return elements["bq"].value;
+	}
+
+	/**
+	 *	Gather the input of heirs and set nheirs[]
+	 *	Overrides the one in irthui.js because this is a different GUI
+	 */
+	function collectInput() {
+		var hc = getHeirsCount();
+		nheirs = hc.split(',');
+		nheirs[bequest] = 0 * 1;
+		nheirs[treasury] = 0 * 1;
+		if (getBequest()) bequestShare = toRational(getBequest());
+		else bequestShare = none;
+		existsBequest = !isZero(bequestShare);
+		debug("===>collectInput: " + getHeirList());
+		getHeirRange();
+	}
+
+	/**
+	 *	Correct the input of heirs. Redundant because isUpdateHeirsInfo() did that already.
+	 *	Overrides the one in irthui.js because this is a different GUI
+	 *	@return	boolean, whether an error in input was detected
+	 */
+	function correctInput() {	//returns boolean
+		for (var i=son; i<treasury; i++) {
+			if (!nheirs[i]) nheirs[i] = 0;
+			if ( (nheirs[i]>1) && ((i==husband) || (i==father) || (i==mother) || (i==gfather) ||
+				(i==gmotherF) || (i==gmotherM) ) ) 
+			{
+				detail("<b" + ">" + formatHeir(i) + ":</b" + ">" + "Nomor dikoreksi menjadi 1");
+				nheirs[i] = 1;
+			}
+		}
+		if ((nheirs[husband]>0) && (nheirs[wife]>0)) {
+			alert("Masukan yang salah dari suami dan istri" + "\n" + "Tolong mulai lagi");
+			return false;
+		}
+		if (nheirs[wife]>4) {
+			detail("<b" + ">" + formatHeir(wife) + ":</b" + ">" + "Nomor dikoreksi menjadi 4");
+			nheirs[wife] = 4;
+		}
+		if (isGt(bequestShare, third)) bequestShare = third;
+		return true;
+	}
+
+	/**
+	 *	Get the selected juristic school
+	 *	@return	int, selected juristic school
+	 */
+	function getSchool() {
+		return elements["sc"].value;
+	}
+
+	/**
+	 *	Set the selected juristic school
+	 *	@param	school: int, selected juristic school
+	 */
+	function setSchool(school) {
+		elements["sc"].value = school;
+	}
+
+	/**
+	 *	Get the selected reversion rule
+	 *	@return	int, selected reversion rule
+	 */
+	function getReversionRule() {
+		return elements["rv"].value;
+	}
+
+	/**
+	 *	Set the selected reversion rule
+	 *	@param	rule: int, selected reversion rule
+	 */
+	function setReversionRule(rule) {
+		elements["rv"].value = rule;
+	}
+
+	/**
+	 *	Get the selected oversubscription rule
+	 *	@return	int, selected oversubscription rule
+	 */
+	function getAwlRule() {
+		return elements["aw"].value;
+	}
+
+	/**
+	 *	Set the selected oversubscription rule
+	 *	@param	rule: int, selected oversubscription rule
+	 */
+	function setAwlRule(rule) {
+		elements["aw"].value = rule;
+	}
+
+	/**
+	 *	Default rv to no reversion if sc is Maliki/Zahiri
+	 */
+	function setRudd() {
+		if (getSchool()==Maliki || getSchool==Zahiri)
+			setReversionRule(0);
+	}
+
+	/**
+	 *	Default aw to no redivision if sc is Zahiri/Jaafari
+	 */
+	function setAwl() {
+		if (getSchool()==Zahiri || getSchool==Jaafari)
+			setAwlRule(0);
+	}
+	/**
+	 *	Ensure that hidden field hc is populated
+	 */
+	function beforeCalculate() {
+		setHeirsCountField();
+	}
+
+	/**
+	 *	Get a list of the heirs
+	 *	@return	string of heir categories and their names
+	 */
+	 function getHeirsList() {
+		return elements["hl"].innerText;
+	}
+
+	/**
+	 *	Set the HeirsList field value
+	 *	@param	hl: value to which to set the field
+	 */
+	 function setHeirsList(hl) {
+		if (hl) elements["hl"].innerText = hl;
+		else elements["hl"].innerText = listHeirs();
+	}
+
+	/**
+	 *	Add an heir, one at a time. Called by the onclick() action of the Add button
+	 */
+	function addHeir() {
+		var index = elements["rl"].value;	//Relations starts with 1, index starts with 0
+		updateHeirsInfo(index);
+		setHeirsCountField();
+		setHeirsList();
+	}
+
+	/**
+	 *	Remove an heir, one at a time. Called by the onclick() action of the Remove button
+	 */
+	function removeHeir() {
+		var index = elements["rl"].value;	//Relations starts with 1, index starts with 0
+		updateHeirsInfo(index, -1);
+		setHeirsCountField();
+		setHeirsList();
+	}
+
+	/**
+	 *	Redo the heir entry, to correct a mistake or to enter another case.
+	 */
+	function redoHeirs() {
+		elements["rl"].selectedIndex = 0;
+		setHeirsInfo(initializeHeirsInfo());
+		setHeirsCountField();
+		setHeirsList(" ");
+		setDistribution(" ");
+		if (resultsWindow) {
+			resultsWindow.close();
+			resultsWindow = null;
+		}
+	}
+
+	/**
+	 *	Get the content of the distribution field
+	 *	@return	string, content of the distribution field
+	 */
+	function getDistribution() {
+		return elements["ed"].innerText;
+	}
+	
+	/**
+	 *	Set the content of the distribution field
+	 *	@param	ed: string, content to set
+	 */
+	function setDistribution(ed) {
+		elements["ed"].innerText = ed;
+	}
+
+	/**
+	 *	Display a report of estate distribution in a separate window
+	 *	Overrides the one in irthui.js because this is a different interface
+	 */
+	function displaySharesNS() {		//Details window. Also, older, non-IE browsers
+		if (!resultsWindow) resultsWindow = open("blank-IGNORE.html","IrthResults");
+		var results = 
+			"<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'" + 
+			"><!-- saved from url=(0056)http://www.islamicsoftware.org/irth/v2/blank-IGNORE.html--" +
+			"><html" + "><head" + "><title" + ">Irth Results</title" + 
+			"><meta http-equiv='X-UA-Compatible' content='IE=EmulateIE7'" + 
+			"><meta name='viewport' content='width=device-width, initial-scale=1.0'/" + 
+			"></head" + ">";
+			var lang = getPageLanguage();
+			var dir = isPageLanguageDirectionRTL()? "rtl" : "ltr";
+			if (lang) 
+				results += "<body lang=" + lang + " dir=" + dir + " >";
+			else results += "<body lang='id' dir='ltr' >";
+		results += " Terjemahan otomatis. Jika Anda dapat memperbaikinya, <a href='mailto:islamicsoftware.org@gmail.com?subject=A better translation'>beri tahu kami</a><br/> ";
+console.log(results);
+		results += "<b" + ">***** MULAILAH *****</b" + "><br" + "/>";
+		results += "<h2" + ">" + "AHLI WARIS" + "<" + "/h2>";
+		results += getHeirList() + "<br" + "/>";
+		results += "<h3" + ">" + "Preferensi" + "<" + "/h3>";
+		results += "Sekolah hukum" + ": " + schoolNames[school] + "<br" + "/>";
+		results += "Pengembalian" + " " + "" + " " + (allowRudd==true? "diizinkan" : "tidak diperbolehkan") + "<br" + "/>";
+		results += "Pengembalian ke pasangan" + " " + "" + " " + (allowRuddToSpouses==true? "diizinkan" : "tidak diperbolehkan") + "<br" + "/>";
+		results += "Pembagian ulang" + " " + "" + " " + (allowAwl==true? "diizinkan" : "tidak diperbolehkan") + "<br" + "/>";
+		results += "Wasiat" + ": " + toLangFraction(bequestShare) + "<br" + "/>";
+
+		results += "<h2" + ">" + "DISTRIBUSI HARTA WARISAN" + "<" + "/h2>";
+		results += "Setelah pembayaran biaya-biaya, hutang-hutang, dan kewajiban-kewajiban, sisa harta warisan itu harus dibagi sebagai berikut" + "," + "<br" + "/>";
+		var multiplier;
+		var num = 0;
+		for (var i=son; i<treasury; i++) {
+			num = nheirs[i]-0;
+			if (num > 1) {
+				multiplier = new Rational(1, nheirs[i]);
+				results += "<b" + ">" + formatHeir(i, true) + "</b" + "> " + 
+					formatWord("get", num, getHeirGender(i)) + " <b" + ">" + 
+					toString(multiply(has(i), multiplier)) + "</b" + "> " + 
+					formatWord("each", num, getHeirGender(i)) + "<br" + ">";
+			}
+			else if (num > 0)
+				results += "<b" + ">" + formatHeir(i, true) + "</b" + "> " + 
+					formatWord("gets", 1, getHeirGender(i)) + " <b" + ">" + 
+					toString(has(i)) + "</b" + "><br" + ">";
+		}
+		if (!isZero(has(treasury)))
+			results += "<b" + ">" + formatHeir(treasury) + "</b" + "> " + "mendapat" + " <b" + ">" + toString(has(treasury)) + "</b" + "><br" + ">";
+		if (!isZero(bequestShare)) {
+			results += "<b" + ">" + 
+			"Wasiat" + 
+			":</b" + "> " + 
+			" <b" + ">" + 
+			toLangFraction(bequestShare) + 
+			"</b" + "><br" + "/>";
+		}
+
+		if (debugText) results += "<h2" + ">" + "Rinciannya" + "<" + "/h2>" + debugText;
+		results += "<b" + ">" + "***** AKHIR *****" + "</b" + "><br" + "><br" + "></body" + "></html" + ">";
+
+		resultsWindow.document.open();
+		resultsWindow.document.write(results);
+		resultsWindow.document.close();
+		if (typeof resultsWindow.focus != "undefined") resultsWindow.focus();
+	}
+
+	/**
+	 *	Display a brief share distribution
+	 *	Overrides the one in irthui.js because this interface doesn't consider bequests
+	 */
+	function displayShares() {		//In-line
+		var results = "Setelah pembayaran biaya-biaya, hutang-hutang, dan kewajiban-kewajiban, sisa harta warisan itu harus dibagi sebagai berikut" + "," + "\n";
+		var multiplier;
+		var num = 0;
+		for (var i=son; i<treasury; i++) {
+			num = nheirs[i]-0;
+			if (num > 1) {
+				multiplier = new Rational(1, nheirs[i]);
+				results += formatHeir(i, true) + " " + 
+					formatWord("get", num, getHeirGender(i)) + " " + 
+					toString(multiply(has(i), multiplier)) + " " + 
+					formatWord("each", num, getHeirGender(i)) + ". ";
+			}
+			else if (num > 0)
+				results += formatHeir(i, true) + " " + 
+					formatWord("gets", 1, getHeirGender(i)) + " " + 
+					toString(has(i)) + ". ";
+		}
+		if (!isZero(has(treasury)))
+			results += formatHeir(treasury) + " " + 
+				"mendapat" + " " +
+				toString(has(treasury)) + ". ";
+		setDistribution(results);
+	}
+
+	/**
+	 *	Calculate the shares then display a report of estate distribution
+	 */
+	function calculate(output) {
+		beforeCalculate();
+		debugText = "";
+		detail("<b" + ">" + "*** Inisialisasi ***" + "</b" + ">");
+		initialize();
+		detail("<b" + ">" + "*** Mengumpulkan masukan ***" + "</b" + ">");
+		collectInput();		//populates nheirs[] from heir counts string
+
+		//Override values computed in irth.js, because a different GUI is used here
+		//bequestShare = none;	//This CGI applies to the remainder of the estate after bequests/debts/expenses
+		//existsBequest = false;
+		school = getSchool();
+		console.log("School: " + school + "\n");
+		allowRudd = (getReversionRule()>0);
+		console.log("Allow Rudd: " + allowRudd + "\n");
+		allowRuddToSpouses = (getReversionRule()==2);
+		console.log("Allow Rudd to spouses: " + allowRuddToSpouses + "\n");
+		allowAwl = (getAwlRule()>0);
+		//End override
+
+		if (correctInput()) {
+			detail("<b" + ">" + "*** Menghitung ***" + "</b" + ">");
+			if (assertTrue(calculateShares(), "Kesalahan selama penghitungan saham"))
+			{
+				console.info("Calculation done");
+			}
+			else {
+				console.error("Calculation incomplete");
+			}
+			detail("<b" + ">" + "*** Menampilkan hasil ***" + "</b" + ">");
+			displayShares();
+			if (output) displaySharesNS();
+		}
+		else
+			console.warn("Error occured during input validation. Please correct and re-try.");
+	}
+
+	/**
+		Reset all the fields on the page
+	 */
+	function clearFields() {
+		elements["rl"].selectedIndex = 0;
+		elements["sc"].selectedIndex = 0;
+		elements["rv"].value = 1;
+		elements["aw"].value = 1;
+		elements["bq"].value = "";
+		redoHeirs();
+		elements["ed"].innerHTML = "&nbsp;";
+		if (resultsWindow) {
+			resultsWindow.close();
+			resultsWindow = null;
+		}
+		elements["dt"].enabled = false;
+		//console.clear();
+	}
+  </script>
+</body>
+</html>
